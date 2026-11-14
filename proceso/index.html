@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cómo se hizo · ¿Cuánto te cuesta de verdad este crédito?</title>
+  <meta name="description" content="De dónde sale la calculadora del costo real de un crédito: el problema de la tasa que no dice todo, los talleres de matemáticas financieras usados como pruebas, las fórmulas (EA, MV, NMV, cuota fija, TIR), la tasa de usura con su fuente, decisiones de diseño, limitaciones y fe de erratas.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bangers&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="../css/estilo.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F9F9F7'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-family='Arial' font-weight='900' font-size='22' fill='%230A090A'%3E%24%3C/text%3E%3Cpath d='M5 27h22' stroke='%23CB433E' stroke-width='3.5'/%3E%3C/svg%3E">
+  <script type="module" src="../js/proceso.js"></script>
+</head>
+<body class="pagina-proceso">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header class="cabecera">
+    <span class="kanji" aria-hidden="true">設計</span>
+    <div class="titulo">
+      <p class="antetitulo">Proceso · ¿Cuánto te cuesta de verdad este crédito?</p>
+      <h1>Cómo se hizo</h1>
+    </div>
+    <nav class="nav">
+      <a class="boton-linea" href="../">Volver a la herramienta</a>
+      <button type="button" class="boton-linea" id="tema" aria-label="Cambiar tema">Tema: auto</button>
+    </nav>
+  </header>
+
+  <main class="articulo" id="contenido">
+    <p class="aviso-proceso" role="note"><strong>Esto no es asesoría financiera.</strong> La herramienta es una calculadora educativa. Las cifras de un crédito real son las del contrato: la entidad debe darte la tasa efectiva anual y el costo total. Aquí no se recomiendan productos ni entidades.</p>
+
+    <nav class="indice vineta" aria-label="En esta página">
+      <ol>
+        <li><a href="#problema">El problema</a></li>
+        <li><a href="#clase">Los talleres de clase</a></li>
+        <li><a href="#metodo">El método</a></li>
+        <li><a href="#usura">La usura</a></li>
+        <li><a href="#diseno">Decisiones de diseño</a></li>
+        <li><a href="#limites">Limitaciones</a></li>
+        <li><a href="#erratas">Fe de erratas</a></li>
+        <li><a href="#fuentes">Fuentes</a></li>
+      </ol>
+    </nav>
+
+    <section id="problema" class="bloque">
+      <h2>1 · El problema: la tasa no lo dice todo</h2>
+      <p>Cuando alguien pide un crédito suele mirar dos cifras: la tasa y la cuota. Las dos esconden cosas. La tasa puede venir en tres formas que no se pueden comparar a ojo: <strong>efectiva anual (EA)</strong>, <strong>nominal mes vencido (NMV)</strong> o <strong>mensual vencida (MV)</strong>. Y la cuota que se anuncia casi nunca incluye el <strong>seguro de vida deudor</strong>, la <strong>cuota de manejo</strong> ni las <strong>comisiones</strong> que se cobran al desembolsar.</p>
+      <p>La herramienta junta todo en una sola cifra, el <strong>costo efectivo</strong>: la tasa que hace que lo que recibes hoy valga lo mismo que todo lo que pagas después. Y la compara con el tope legal en Colombia, la <strong>tasa de usura</strong>.</p>
+      <div class="vineta figura">
+        <h3>El ejemplo con el que abre (crédito de consumo ficticio)</h3>
+        <p>10 millones de pesos a 36 meses, 24 % EA, seguro de vida de 0,1 % mensual sobre el saldo, $ 5.000 de cargos al mes y $ 100.000 de comisión inicial. Son valores supuestos para el ejemplo; no corresponden a ninguna entidad ni oferta.</p>
+        <ul id="c-ejemplo"></ul>
+      </div>
+    </section>
+
+    <section id="clase" class="bloque">
+      <h2>2 · Los talleres de clase, convertidos en pruebas</h2>
+      <p>La base son seis trabajos de <strong>Matemáticas Financieras</strong> (Ingeniería de Sistemas, 2024) de Mario y David: dos talleres de interés simple y compuesto, un taller de tasas equivalentes, uno de anualidades, dos parciales y un proyecto escrito. Los ejercicios resueltos se volvieron <strong>pruebas automáticas</strong> (<code>node --test</code>): el dato de la fuente entra y el resultado esperado tiene que salir. Si la respuesta de clase estaba mal, la prueba usa el valor corregido y el error queda en la <a href="#erratas">fe de erratas</a>.</p>
+      <div class="tabla-scroll tabla-proceso" tabindex="0" role="region" aria-label="Ejercicios de clase usados como pruebas">
+        <table class="tabla">
+          <caption>Ejercicios de clase usados como pruebas. Los resultados esperados se calcularon aquí con las mismas funciones de la herramienta.</caption>
+          <thead><tr><th scope="col">Ejercicio</th><th scope="col">Dato de la fuente</th><th scope="col">Esperado</th><th scope="col">Respuesta de clase</th></tr></thead>
+          <tbody>
+            <tr><td>Tasas, 5</td><td>18 % compuesto por días frente a 18,02 % efectivo</td><td class="num">19,72 % EA</td><td><span class="prueba-ok">sin respuesta; se completa</span></td></tr>
+            <tr><td>Tasas, 27</td><td>20,6 % mensual, 21 % trimestral, 21,4 % semestral, 20,5 % diario: ¿cuál es más barata?</td><td class="num">21,4 % semestral (22,54 % EA)</td><td><span class="prueba-ok">sin respuesta; se completa</span></td></tr>
+            <tr><td>Compuesto, 22</td><td>US$ 600 en dos abonos a 2 y 3 meses, 16 % compuesto por meses</td><td class="num">US$ 310,09</td><td><span class="prueba-ok">310,09</span> (procedimiento con errores)</td></tr>
+            <tr><td>Compuesto, 24</td><td>Duplicar un capital en 4 años, compuesto por semanas</td><td class="num">17,35758 %</td><td><span class="prueba-ok">sin respuesta; opción a</span></td></tr>
+            <tr><td>Compuesto, 36</td><td>Interés global de 1,15 % mensual a 8 meses</td><td class="num">23,98 % nominal mensual</td><td><span class="prueba-mal">9,2 %</span></td></tr>
+            <tr><td>Compuesto, 38</td><td>Tres pagos bimestrales de 35.000 al 13,8 % anual compuesto por bimestres</td><td class="num">100.348,96</td><td><span class="prueba-ok">100.348,94</span> (redondeo)</td></tr>
+            <tr><td>Anualidades, 31</td><td>Anticipo y dos pagos a 3 y 7 meses, 15,8 % efectivo</td><td class="num">1.326.045,71 pesos</td><td><span class="prueba-ok">opción a</span></td></tr>
+            <tr><td>Anualidades, 30 y 32</td><td>Reestructurar en 8 pagos mensuales; ¿cuánto se ahorró?</td><td class="num">$ 153.689,53; nada</td><td><span class="prueba-mal">171.500; «ahorro 38.000»</span></td></tr>
+            <tr><td>Anualidades, 35</td><td>Pagaré de 1.950.000 pesos a 13 meses al 12 % efectivo</td><td class="num">1.724.706,05 pesos</td><td><span class="prueba-ok">opción a</span></td></tr>
+            <tr><td>Parcial 1, 4</td><td>Cuatro pagos bimestrales de 25.000 al 10 % anual compuesto por bimestres</td><td class="num">95.968,28</td><td><span class="prueba-mal">104.063</span></td></tr>
+            <tr><td>Parcial 2, 4</td><td>Cinco pagos bimestrales de 40.000 al 12 % anual compuesto por bimestres</td><td class="num">188.538,38</td><td><span class="prueba-ok">188.535</span> (redondeo)</td></tr>
+            <tr><td>Parciales, 3</td><td>Triplicar un capital en 5 y 6 años, compuesto por semanas</td><td class="num">22,02 % y 18,34 %</td><td><span class="prueba-mal">«0,221 %» y «0,183 %»</span></td></tr>
+            <tr><td>Interés simple, 11</td><td>$ 14.250 al 7,3 % simple durante 135 días</td><td class="num">$ 14.634,75</td><td><span class="prueba-ok">14.634,74</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="nota-fuente">Del material solo se usan los ejercicios y sus cifras. No se publican nombres de compañeros ni docentes, ni los montos que el extractor ocultó. Total: 32 pruebas, 13 de ellas con ejercicios de clase.</p>
+    </section>
+
+    <section id="metodo" class="bloque">
+      <h2>3 · El método</h2>
+      <div class="dos-col">
+        <div>
+          <h3>Convertir la tasa</h3>
+          <p class="formula">MV = (1 + EA)<sup>1/12</sup> − 1<br>NMV = 12 · MV<br>EA = (1 + MV)<sup>12</sup> − 1</p>
+          <p>El error más común: dividir la EA entre 12. 24 % EA no es 2 % mensual sino 1,8088 % (calculado aquí). Al revés, 2 % mensual son 26,82 % EA, no 24 %.</p>
+          <h3>Cuota fija (sistema francés)</h3>
+          <p class="formula">cuota = P · i / (1 − (1 + i)<sup>−n</sup>)</p>
+          <p>P: monto; i: tasa MV; n: número de cuotas. Con tasa 0, la cuota es P / n. Cada mes, interés = saldo × i; capital = cuota − interés; la última cuota cierra el saldo exacto.</p>
+        </div>
+        <div>
+          <h3>Costo efectivo (TIR)</h3>
+          <p class="formula">(P − comisiones) = Σ pago<sub>t</sub> / (1 + r)<sup>t</sup><br>costo EA = (1 + r)<sup>12</sup> − 1</p>
+          <p>pago<sub>t</sub> = cuota + seguro<sub>t</sub> + cargos. La tasa r es la <strong>tasa interna de retorno</strong> (TIR): la que deja en cero el valor presente neto. Se busca con el método de <strong>Newton</strong> (rápido) y, si no converge, con <strong>bisección</strong> (lento, pero siempre encuentra la raíz si hay cambio de signo).</p>
+          <p>Se calcula dos veces: con seguros (lo que de verdad sale de tu bolsillo) y sin seguros (lo que se compara con la usura; ver la sección 4).</p>
+        </div>
+      </div>
+      <figure class="vineta figura">
+        <h3>A dónde va cada pago del ejemplo, mes a mes</h3>
+        <div class="g-caja" id="g-cuotas"></div>
+        <ul class="leyenda"><li><i style="--c: var(--cian)"></i>Interés</li><li><i style="--c: var(--papel-2)"></i>Capital</li><li><i style="--c: var(--ambar)"></i>Seguro</li><li><i style="--c: var(--rojo)"></i>Cargos</li></ul>
+        <figcaption>En el sistema francés la cuota es fija, pero su contenido cambia: al principio casi la mitad es interés; al final, casi todo es capital. El seguro sobre el saldo baja con él (calculado aquí).</figcaption>
+      </figure>
+      <figure class="vineta figura">
+        <h3>La misma comisión pesa más en plazos cortos</h3>
+        <div class="g-caja" id="g-plazos"></div>
+        <figcaption>Mismo crédito del ejemplo cambiando solo el plazo. La comisión inicial de $ 100.000 se reparte entre menos meses y sube el costo efectivo: a 6 meses, el costo sin seguro ya pasa la usura aunque la tasa pactada sea 24 % (calculado aquí).</figcaption>
+        <div class="tabla-scroll tabla-proceso" tabindex="0" role="region" aria-label="Costo efectivo según el plazo">
+          <table class="tabla">
+            <thead><tr><th scope="col">Plazo (meses)</th><th scope="col">Costo sin seguro</th><th scope="col">Costo con seguro</th><th scope="col">Frente a la usura</th></tr></thead>
+            <tbody id="t-plazos"></tbody>
+          </table>
+        </div>
+      </figure>
+    </section>
+
+    <section id="usura" class="bloque">
+      <h2>4 · La tasa de usura</h2>
+      <p>La <strong>Superintendencia Financiera de Colombia</strong> certifica cada mes el <strong>interés bancario corriente (IBC)</strong> de cada modalidad de crédito. La <strong>tasa de usura</strong> es 1,5 veces ese IBC: cobrar intereses por encima es delito (artículo 305 del Código Penal), y la herramienta lo usa como tope de referencia.</p>
+      <div class="vineta figura">
+        <h3>Certificación vigente</h3>
+        <p id="vigencia" class="nota-fuente">Cargando…</p>
+        <div class="tabla-scroll tabla-proceso" tabindex="0" role="region" aria-label="Interés bancario corriente y usura por modalidad">
+          <table class="tabla">
+            <thead><tr><th scope="col">Modalidad</th><th scope="col">IBC (EA)</th><th scope="col">Usura = 1,5 × IBC (EA)</th></tr></thead>
+            <tbody id="t-modalidades"></tbody>
+          </table>
+        </div>
+        <p class="nota-fuente">El IBC es el de la Superfinanciera; la usura de cada modalidad se recalculó aquí (1,5 × IBC, redondeado a dos decimales) y coincide con la que publicó la entidad para consumo y ordinario (28,34 %). El «microcrédito» ya no se certifica: desde el 1 de abril de 2023 lo reemplazan las modalidades de crédito productivo (Decreto 455 de 2023); su última certificación fue de 39,20 % de IBC, para enero a marzo de 2023.</p>
+      </div>
+      <h3>¿Qué cuenta como interés?</h3>
+      <p class="cita">La Ley 45 de 1990, artículo 68, reputa intereses las sumas que el acreedor recibe «sin contraprestación distinta al crédito otorgado», aunque se llamen honorarios o comisiones.</p>
+      <p>Por eso la herramienta compara con la usura el costo <strong>con cargos y comisiones pero sin seguros</strong>: el seguro de vida tiene una contraprestación propia (la cobertura). Es una lectura simplificada: si un cargo concreto cuenta o no como interés depende del contrato y del reglamento, y el semáforo es una señal para revisar, no un dictamen.</p>
+      <figure class="vineta figura">
+        <h3>La usura de consumo desde 2022</h3>
+        <div class="g-caja" id="g-historico"></div>
+        <ul class="leyenda"><li><i style="--c: var(--rojo)"></i>Usura (1,5 × IBC, calculado aquí)</li><li><i style="--c: var(--cian)"></i>IBC certificado</li></ul>
+        <figcaption>Datos abiertos de la Superfinanciera en datos.gov.co, enero de 2022 a noviembre de 2026. El tope legal cambia cada mes: la misma tasa puede estar bien un mes y pasarse en otro. La herramienta consulta la certificación en vivo y, si no puede, usa la copia guardada.</figcaption>
+      </figure>
+    </section>
+
+    <section id="diseno" class="bloque">
+      <h2>5 · Decisiones de diseño</h2>
+      <ol class="decisiones">
+        <li><strong>Una cifra grande: el costo efectivo.</strong> No la cuota ni la tasa pactada, sino lo que de verdad cuesta, marcado «calculado aquí».</li>
+        <li><strong>Semáforo frente a la usura, con fecha y fuente al lado.</strong> Verde por debajo, ámbar a menos de 3 puntos, rojo en el tope o encima. El chip dice si la usura viene en vivo o de la copia guardada, y si la certificación ya no está vigente lo dice: «última certificación verificada».</li>
+        <li><strong>El medidor muestra la brecha.</strong> Cian es la tasa pactada; rojo, lo que le añaden seguro, cargos y comisiones; la raya, la usura. Se ve cuánto del costo no está en la tasa.</li>
+        <li><strong>Las tres formas de la tasa</strong> se muestran juntas, para que nadie divida la EA entre 12.</li>
+        <li><strong>Tabla completa, no un resumen.</strong> Mes a mes, con encabezado fijo y totales abajo; en el celular se desliza dentro de su caja, sin mover la página.</li>
+        <li><strong>Abre con un ejemplo marcado.</strong> El chip ámbar «Ejemplo ficticio» se apaga en cuanto cambias un dato.</li>
+      </ol>
+      <div class="dos-col">
+        <div class="vineta">
+          <h3>Paleta</h3>
+          <div class="paleta">
+            <span style="--c:#F9F9F7">Papel<br><code>#F9F9F7</code></span>
+            <span class="osc" style="--c:#0A090A">Tinta<br><code>#0A090A</code></span>
+            <span style="--c:#CB433E">Rojo: costo y usura<br><code>#CB433E</code></span>
+            <span style="--c:#438FB8">Cian: tasa pactada<br><code>#438FB8</code></span>
+            <span style="--c:#E8B44A">Ámbar: ejemplo y seguro<br><code>#E8B44A</code></span>
+            <span style="--c:#3E9A62">Verde: solo el semáforo<br><code>#3E9A62</code></span>
+            <span class="osc" style="--c:#141C33">Noche (oscuro)<br><code>#141C33</code></span>
+          </div>
+        </div>
+        <div class="vineta">
+          <h3>Versiones</h3>
+          <div class="boceto">
+            <figure>
+              <svg class="grafica" viewBox="0 0 260 120" role="img" aria-label="Boceto 1: formulario arriba y una tabla larga debajo">
+                <g fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="248" height="30"/><rect x="6" y="46" width="248" height="68"/></g>
+                <g stroke="currentColor" stroke-width="1.2"><line x1="6" y1="60" x2="254" y2="60"/><line x1="6" y1="74" x2="254" y2="74"/><line x1="6" y1="88" x2="254" y2="88"/><line x1="6" y1="102" x2="254" y2="102"/></g>
+              </svg>
+              <figcaption>Versión 1: un simulador de cuota con su tabla. Correcto, pero no dice cuánto cuesta de verdad ni si es legal.</figcaption>
+            </figure>
+            <figure>
+              <svg class="grafica" viewBox="0 0 260 120" role="img" aria-label="Boceto 2: formulario a la izquierda, cifra grande y semáforo a la derecha">
+                <rect x="6" y="6" width="104" height="108" fill="none" stroke="currentColor" stroke-width="2"/>
+                <rect x="122" y="10" width="96" height="26" fill="#CB433E"/>
+                <rect x="226" y="10" width="26" height="62" rx="5" fill="currentColor"/>
+                <circle cx="239" cy="22" r="7" fill="#CB433E"/><circle cx="239" cy="41" r="7" fill="#E8B44A"/><circle cx="239" cy="60" r="7" fill="#3E9A62"/>
+                <rect x="122" y="86" width="60" height="12" fill="#438FB8"/><rect x="182" y="86" width="18" height="12" fill="#CB433E"/><line x1="212" y1="80" x2="212" y2="104" stroke="currentColor" stroke-width="3"/>
+              </svg>
+              <figcaption>Versión 2 (la elegida): datos a la izquierda; a la derecha el costo efectivo, el semáforo y el medidor con la raya de la usura.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="limites" class="bloque">
+      <h2>6 · Limitaciones</h2>
+      <ul>
+        <li><strong>No es asesoría financiera.</strong> No sabe nada de tu situación, no recomienda productos ni entidades y no reemplaza leer el contrato.</li>
+        <li><strong>Crédito simple:</strong> tasa fija, cuotas mensuales vencidas e iguales, sin periodo de gracia, abonos extra, mora ni cuotas extraordinarias. Las tarjetas de crédito y los créditos de tasa variable funcionan distinto.</li>
+        <li><strong>El seguro sobre el saldo</strong> se calcula sobre el saldo al inicio de cada mes; algunas entidades lo calculan sobre el saldo inicial del crédito o con tarifas por edad.</li>
+        <li><strong>Sin IVA ni impuestos.</strong> Si un cargo lleva IVA, escríbelo con el IVA incluido.</li>
+        <li><strong>La comparación con la usura es orientativa.</strong> Se compara el costo efectivo con cargos y comisiones, sin seguros; que un cobro concreto cuente o no como interés lo decide la norma y, en un caso real, la Superfinanciera o un juez. La usura se compara con la certificación vigente hoy, no con la del mes en que se firmó el crédito.</li>
+        <li><strong>Redondeos.</strong> Las entidades redondean cuotas al peso o a la decena; aquí no se redondea y la diferencia es de unos pocos pesos.</li>
+      </ul>
+    </section>
+
+    <section id="erratas" class="bloque">
+      <h2>7 · Fe de erratas</h2>
+      <div class="vineta errata">
+        <h3>Talleres y parciales de Matemáticas Financieras (2024)</h3>
+        <p>Cada punto dice qué decía el trabajo, qué es lo correcto y qué usa la herramienta. Los valores correctos están calculados aquí y comprobados por las pruebas.</p>
+        <ul>
+          <li><strong>Interés global (compuesto, ej. 36).</strong> <b>El trabajo decía</b>: 1,15 % × 8 meses = 9,2 % como «tasa anual capitalizable por meses». <b>Lo correcto:</b> 9,2 % es el interés total de los 8 meses, no una tasa anual. Si el crédito se paga en 8 cuotas mensuales iguales que suman capital más 9,2 %, la tasa real es 1,998 % mensual: <strong>23,98 % nominal anual capitalizable por meses</strong> (26,80 % EA). Es la misma trampa que la herramienta destapa: una tasa «global» baja que esconde un costo más del doble. <b>La herramienta usa</b> la TIR para eso.</li>
+          <li><strong>Préstamo mayor que sus pagos (parcial 1, ej. 4).</strong> <b>El trabajo decía</b>: cuatro pagos bimestrales de 25.000 al 10 % compuesto bimestralmente equivalen a un préstamo de 104.063. <b>Lo correcto:</b> con interés positivo, un préstamo vale menos que la suma de sus pagos (100.000). Los pagos se multiplicaron por (1 + i)<sup>k</sup> en vez de dividirse: el préstamo era de <strong>95.968,28</strong>. <b>La herramienta usa</b> el valor presente, dividiendo.</li>
+          <li><strong>«Ahorro» al reestructurar (anualidades, ej. 30 y 32).</strong> <b>El trabajo decía</b>: 8 pagos de 171.500 suman 1.372.000 frente a 1.410.000 del plan original, «ahorro = 38.000». <b>Lo correcto:</b> tres errores. La cuota era <strong>153.689,53</strong>; la suma original incluía el anticipo de 190.000 y la nueva no; y se sumaron pesos de fechas distintas. A la misma tasa (15,8 % efectivo), los dos planes valen lo mismo hoy: <strong>no se ahorró nada</strong> (opción d). En pesos sin descontar, los 8 pagos suman 1.229.516,21 frente a 1.220.000 pendientes: 9.516,21 más. <b>La herramienta usa</b> valores presentes, nunca sumas de pesos de fechas distintas, para el costo efectivo.</li>
+          <li><strong>Procedimiento de los dos abonos (compuesto, ej. 22).</strong> <b>El trabajo decía</b>: M = 307,85 + 311,85 = 620,7, y 620,7 / 2 = 310,09. <b>Lo correcto:</b> 307,85 + 311,85 = 619,70, y promediar valores futuros no es el método. La ecuación de valor es X/(1 + i)<sup>2</sup> + X/(1 + i)<sup>3</sup> = 600 con i = 16 %/12, y da X = <strong>310,09</strong>: la respuesta final era correcta, el camino no.</li>
+          <li><strong>Unidades de la tasa (parciales, ej. 3).</strong> <b>El trabajo decía</b>: «0,221 %» y «0,183 %» como tasas anuales para triplicar un capital en 5 y 6 años. <b>Lo correcto:</b> <strong>22,02 %</strong> y <strong>18,34 %</strong> anual compuesto por semanas (0,4234 % y 0,3527 % semanal). El cálculo de la tasa semanal del primero estaba bien (0,004234); se perdió al pasarlo a porcentaje anual. <b>La herramienta</b> muestra siempre la tasa con su tipo: EA, NMV o MV.</li>
+          <li><strong>Redondear el tiempo (interés simple, ej. 11).</strong> <b>El trabajo</b> usó n = 0,37 años para 135 días y obtuvo 14.634,74. Con 0,37 el resultado sería 14.634,89; con 135/365 exacto es <strong>14.634,75</strong>. La diferencia es pequeña, pero redondear el tiempo antes de calcular es mala práctica. <b>La herramienta</b> no redondea nada hasta mostrar el resultado.</li>
+        </ul>
+      </div>
+      <div class="vineta errata">
+        <h3>Errores comunes que la herramienta corrige</h3>
+        <ul>
+          <li><strong>Dividir la EA entre 12.</strong> 24 % EA ÷ 12 = 2 % no es la tasa mensual: es 1,8088 % MV. Con 2 % MV el crédito cuesta 26,82 % EA (calculado aquí).</li>
+          <li><strong>Comparar solo la tasa.</strong> En el ejemplo, la tasa pactada de 24 % EA queda 4,34 puntos por debajo de la usura; el costo sin seguros, 26,10 %, ya está a 2,24 puntos (calculado aquí).</li>
+          <li><strong>Creer que la comisión «es poquita».</strong> Una comisión de $ 100.000 sobre un crédito de 10 millones es el 1 %, pero, sola y a 6 meses, sube el costo efectivo de 24 % a 28,42 % EA: 4,42 puntos, por encima de la usura (calculado aquí). A 36 meses sube 0,91 puntos.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="fuentes" class="bloque">
+      <h2>8 · Fuentes</h2>
+      <ol class="fuentes">
+        <li>Superintendencia Financiera de Colombia. <a href="https://www.superfinanciera.gov.co/publicaciones/10116308/superfinanciera-certifica-el-interes-bancario-corriente/">«Superfinanciera certifica el Interés Bancario Corriente»</a>, comunicado del 30 de octubre de 2026 (Resolución 1707 de 2026, vigencia 1 al 30 de noviembre de 2026; consumo y ordinario 18,89 %, usura 28,34 %). Consultado el 14 de noviembre de 2026.</li>
+        <li>Superintendencia Financiera de Colombia. <a href="https://www.datos.gov.co/Econom-a-y-Finanzas/Tasa-de-inter-s-bancario-corriente-TIBC/pare-7x5i">«Tasa de interés bancario corriente - TIBC»</a>, datos abiertos en datos.gov.co (conjunto pare-7x5i; API <code>https://www.datos.gov.co/resource/pare-7x5i.json</code>, con CORS abierto). Consultado el 14 de noviembre de 2026.</li>
+        <li>Congreso de Colombia. <a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=77540">Ley 45 de 1990</a>, artículo 68 (sumas que se reputan intereses). Gestor Normativo de Función Pública, consultado el 14 de noviembre de 2026.</li>
+        <li>Ministerio de Hacienda y Crédito Público. Decreto 455 del 29 de marzo de 2023 (nuevas modalidades de crédito productivo, que reemplazan al microcrédito en la certificación del IBC), según la reseña de la Superfinanciera y prensa especializada. Consultado el 14 de noviembre de 2026.</li>
+        <li>Código Penal colombiano (Ley 599 de 2000), artículo 305: usura.</li>
+        <li>Trabajos de clase de Mario Puerta y David Rincón: talleres de interés simple, interés compuesto, tasas equivalentes y anualidades, dos parciales y un proyecto escrito de Matemáticas Financieras (2024). Material propio, no publicado aquí.</li>
+      </ol>
+    </section>
+
+    <a class="volver" href="../">Calcular el costo de mi crédito →</a>
+  </main>
+
+  <footer class="pie">
+    <p>Proceso de la herramienta «¿Cuánto te cuesta de verdad este crédito?». <strong>Esto no es asesoría financiera.</strong> Código con licencia MIT.</p>
+    <p class="creditos"><a href="https://github.com/ale0009" target="_blank" rel="noopener">Mario Puerta «ale0009»</a> × <a href="https://www.linkedin.com/in/davidalexanderrinconcorredorkuronoma/" target="_blank" rel="noopener">David Rincón «Kuronoma»</a> <a href="https://kx-portafolio.vercel.app" target="_blank" rel="noopener">Portafolio</a></p>
+  </footer>
+</body>
+</html>

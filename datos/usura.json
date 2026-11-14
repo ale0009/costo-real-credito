@@ -1,0 +1,421 @@
+{
+ "_nota": "Cifras certificadas por la Superintendencia Financiera de Colombia. Usura = 1,5 x interés bancario corriente (IBC), en efectivo anual. Copia de respaldo para el modo sin conexión.",
+ "entidad": "Superintendencia Financiera de Colombia",
+ "resolucion": "Resolución 1707 de 2026",
+ "fecha_resolucion": "2026-10-30",
+ "vigencia_desde": "2026-11-01",
+ "vigencia_hasta": "2026-11-30",
+ "fecha_consulta": "2026-11-14",
+ "fuentes": [
+  {
+   "titulo": "Superfinanciera certifica el Interés Bancario Corriente (comunicado, 30 oct 2026)",
+   "url": "https://www.superfinanciera.gov.co/publicaciones/10116308/superfinanciera-certifica-el-interes-bancario-corriente/"
+  },
+  {
+   "titulo": "Tasa de interés bancario corriente -TIBC (datos abiertos, conjunto pare-7x5i)",
+   "url": "https://www.datos.gov.co/Econom-a-y-Finanzas/Tasa-de-inter-s-bancario-corriente-TIBC/pare-7x5i"
+  }
+ ],
+ "api": "https://www.datos.gov.co/resource/pare-7x5i.json",
+ "microcredito": "Desde el 1 de abril de 2023 (Decreto 455 de 2023) la Superfinanciera ya no certifica «microcrédito»: lo reemplazan las modalidades de crédito productivo. Última certificación de microcrédito: IBC 39,20 % EA, Resolución 1968 de 2022, vigente del 1 de enero al 31 de marzo de 2023.",
+ "modalidades": [
+  {
+   "id": "consumo-ordinario",
+   "nombre": "Consumo y ordinario",
+   "ibc_ea": 18.89,
+   "usura_ea": 28.34
+  },
+  {
+   "id": "consumo-bajo-monto",
+   "nombre": "Consumo de bajo monto",
+   "ibc_ea": 47.88,
+   "usura_ea": 71.82
+  },
+  {
+   "id": "productivo-mayor-monto",
+   "nombre": "Productivo de mayor monto",
+   "ibc_ea": 28.23,
+   "usura_ea": 42.35
+  },
+  {
+   "id": "productivo-rural",
+   "nombre": "Productivo rural",
+   "ibc_ea": 22.58,
+   "usura_ea": 33.87
+  },
+  {
+   "id": "productivo-urbano",
+   "nombre": "Productivo urbano",
+   "ibc_ea": 39.91,
+   "usura_ea": 59.87
+  },
+  {
+   "id": "popular-productivo-rural",
+   "nombre": "Popular productivo rural",
+   "ibc_ea": 44.6,
+   "usura_ea": 66.9
+  },
+  {
+   "id": "popular-productivo-urbano",
+   "nombre": "Popular productivo urbano",
+   "ibc_ea": 58.96,
+   "usura_ea": 88.44
+  }
+ ],
+ "historico_consumo": [
+  {
+   "desde": "2022-01-01",
+   "hasta": "2022-01-31",
+   "resolucion": "1597",
+   "ibc_ea": 17.66
+  },
+  {
+   "desde": "2022-02-01",
+   "hasta": "2022-02-28",
+   "resolucion": "143",
+   "ibc_ea": 18.3
+  },
+  {
+   "desde": "2022-03-01",
+   "hasta": "2022-03-31",
+   "resolucion": "256",
+   "ibc_ea": 18.47
+  },
+  {
+   "desde": "2022-04-01",
+   "hasta": "2022-04-30",
+   "resolucion": "382",
+   "ibc_ea": 19.05
+  },
+  {
+   "desde": "2022-05-01",
+   "hasta": "2022-05-31",
+   "resolucion": "498",
+   "ibc_ea": 19.71
+  },
+  {
+   "desde": "2022-06-01",
+   "hasta": "2022-06-30",
+   "resolucion": "617",
+   "ibc_ea": 20.4
+  },
+  {
+   "desde": "2022-07-01",
+   "hasta": "2022-07-31",
+   "resolucion": "801",
+   "ibc_ea": 21.28
+  },
+  {
+   "desde": "2022-08-01",
+   "hasta": "2022-08-31",
+   "resolucion": "973",
+   "ibc_ea": 22.21
+  },
+  {
+   "desde": "2022-09-01",
+   "hasta": "2022-09-30",
+   "resolucion": "1126",
+   "ibc_ea": 23.5
+  },
+  {
+   "desde": "2022-10-01",
+   "hasta": "2022-10-31",
+   "resolucion": "1327",
+   "ibc_ea": 24.61
+  },
+  {
+   "desde": "2022-11-01",
+   "hasta": "2022-11-30",
+   "resolucion": "1537",
+   "ibc_ea": 25.78
+  },
+  {
+   "desde": "2022-12-01",
+   "hasta": "2022-12-31",
+   "resolucion": "1715",
+   "ibc_ea": 27.64
+  },
+  {
+   "desde": "2023-01-01",
+   "hasta": "2023-01-31",
+   "resolucion": "1968",
+   "ibc_ea": 28.84
+  },
+  {
+   "desde": "2023-02-01",
+   "hasta": "2023-02-28",
+   "resolucion": "100",
+   "ibc_ea": 30.18
+  },
+  {
+   "desde": "2023-03-01",
+   "hasta": "2023-03-31",
+   "resolucion": "236",
+   "ibc_ea": 30.84
+  },
+  {
+   "desde": "2023-04-01",
+   "hasta": "2023-04-30",
+   "resolucion": "472",
+   "ibc_ea": 31.39
+  },
+  {
+   "desde": "2023-05-01",
+   "hasta": "2023-05-31",
+   "resolucion": "606",
+   "ibc_ea": 30.27
+  },
+  {
+   "desde": "2023-06-01",
+   "hasta": "2023-06-30",
+   "resolucion": "766",
+   "ibc_ea": 29.76
+  },
+  {
+   "desde": "2023-07-01",
+   "hasta": "2023-07-31",
+   "resolucion": "945",
+   "ibc_ea": 29.36
+  },
+  {
+   "desde": "2023-08-01",
+   "hasta": "2023-08-31",
+   "resolucion": "1090",
+   "ibc_ea": 28.75
+  },
+  {
+   "desde": "2023-09-01",
+   "hasta": "2023-09-30",
+   "resolucion": "1328",
+   "ibc_ea": 28.03
+  },
+  {
+   "desde": "2023-10-01",
+   "hasta": "2023-10-31",
+   "resolucion": "1520",
+   "ibc_ea": 26.53
+  },
+  {
+   "desde": "2023-11-01",
+   "hasta": "2023-11-30",
+   "resolucion": "1801",
+   "ibc_ea": 25.52
+  },
+  {
+   "desde": "2023-12-01",
+   "hasta": "2023-12-31",
+   "resolucion": "2074",
+   "ibc_ea": 25.04
+  },
+  {
+   "desde": "2024-01-01",
+   "hasta": "2024-01-31",
+   "resolucion": "2331",
+   "ibc_ea": 23.32
+  },
+  {
+   "desde": "2024-02-01",
+   "hasta": "2024-02-29",
+   "resolucion": "150",
+   "ibc_ea": 23.31
+  },
+  {
+   "desde": "2024-03-01",
+   "hasta": "2024-03-31",
+   "resolucion": "400",
+   "ibc_ea": 22.2
+  },
+  {
+   "desde": "2024-04-01",
+   "hasta": "2024-04-30",
+   "resolucion": "598",
+   "ibc_ea": 22.06
+  },
+  {
+   "desde": "2024-05-01",
+   "hasta": "2024-05-31",
+   "resolucion": "872",
+   "ibc_ea": 21.02
+  },
+  {
+   "desde": "2024-06-01",
+   "hasta": "2024-06-30",
+   "resolucion": "1143",
+   "ibc_ea": 20.56
+  },
+  {
+   "desde": "2024-07-01",
+   "hasta": "2024-07-31",
+   "resolucion": "1308",
+   "ibc_ea": 19.66
+  },
+  {
+   "desde": "2024-08-01",
+   "hasta": "2024-08-31",
+   "resolucion": "1519",
+   "ibc_ea": 19.47
+  },
+  {
+   "desde": "2024-09-01",
+   "hasta": "2024-09-30",
+   "resolucion": "1688",
+   "ibc_ea": 19.23
+  },
+  {
+   "desde": "2024-10-01",
+   "hasta": "2024-10-31",
+   "resolucion": "1901",
+   "ibc_ea": 18.78
+  },
+  {
+   "desde": "2024-11-01",
+   "hasta": "2024-11-30",
+   "resolucion": "2168",
+   "ibc_ea": 18.6
+  },
+  {
+   "desde": "2024-12-01",
+   "hasta": "2024-12-31",
+   "resolucion": "2394",
+   "ibc_ea": 17.59
+  },
+  {
+   "desde": "2025-01-01",
+   "hasta": "2025-01-31",
+   "resolucion": "2620",
+   "ibc_ea": 16.59
+  },
+  {
+   "desde": "2025-02-01",
+   "hasta": "2025-02-28",
+   "resolucion": "138",
+   "ibc_ea": 17.53
+  },
+  {
+   "desde": "2025-03-01",
+   "hasta": "2025-03-31",
+   "resolucion": "352",
+   "ibc_ea": 16.61
+  },
+  {
+   "desde": "2025-04-01",
+   "hasta": "2025-04-30",
+   "resolucion": "579",
+   "ibc_ea": 17.08
+  },
+  {
+   "desde": "2025-05-01",
+   "hasta": "2025-05-31",
+   "resolucion": "837",
+   "ibc_ea": 17.31
+  },
+  {
+   "desde": "2025-06-01",
+   "hasta": "2025-06-30",
+   "resolucion": "1078",
+   "ibc_ea": 17.03
+  },
+  {
+   "desde": "2025-07-01",
+   "hasta": "2025-07-31",
+   "resolucion": "1254",
+   "ibc_ea": 16.52
+  },
+  {
+   "desde": "2025-08-01",
+   "hasta": "2025-08-31",
+   "resolucion": "1490",
+   "ibc_ea": 16.78
+  },
+  {
+   "desde": "2025-09-01",
+   "hasta": "2025-09-30",
+   "resolucion": "1658",
+   "ibc_ea": 16.67
+  },
+  {
+   "desde": "2025-10-01",
+   "hasta": "2025-10-31",
+   "resolucion": "1821",
+   "ibc_ea": 16.24
+  },
+  {
+   "desde": "2025-11-01",
+   "hasta": "2025-11-30",
+   "resolucion": "1995",
+   "ibc_ea": 16.66
+  },
+  {
+   "desde": "2025-12-01",
+   "hasta": "2025-12-31",
+   "resolucion": "2134",
+   "ibc_ea": 16.68
+  },
+  {
+   "desde": "2026-01-01",
+   "hasta": "2026-01-31",
+   "resolucion": "2288",
+   "ibc_ea": 16.24
+  },
+  {
+   "desde": "2026-02-01",
+   "hasta": "2026-02-28",
+   "resolucion": "250",
+   "ibc_ea": 16.82
+  },
+  {
+   "desde": "2026-03-01",
+   "hasta": "2026-03-31",
+   "resolucion": "405",
+   "ibc_ea": 17.01
+  },
+  {
+   "desde": "2026-04-01",
+   "hasta": "2026-04-30",
+   "resolucion": "517",
+   "ibc_ea": 17.84
+  },
+  {
+   "desde": "2026-05-01",
+   "hasta": "2026-05-31",
+   "resolucion": "662",
+   "ibc_ea": 18.78
+  },
+  {
+   "desde": "2026-06-01",
+   "hasta": "2026-06-30",
+   "resolucion": "823",
+   "ibc_ea": 19.19
+  },
+  {
+   "desde": "2026-07-01",
+   "hasta": "2026-07-31",
+   "resolucion": "965",
+   "ibc_ea": 19.19
+  },
+  {
+   "desde": "2026-08-01",
+   "hasta": "2026-08-31",
+   "resolucion": "1139",
+   "ibc_ea": 19.77
+  },
+  {
+   "desde": "2026-09-01",
+   "hasta": "2026-09-30",
+   "resolucion": "1260",
+   "ibc_ea": 19.49
+  },
+  {
+   "desde": "2026-10-01",
+   "hasta": "2026-10-31",
+   "resolucion": "1472",
+   "ibc_ea": 19.06
+  },
+  {
+   "desde": "2026-11-01",
+   "hasta": "2026-11-30",
+   "resolucion": "1707",
+   "ibc_ea": 18.89
+  }
+ ]
+}

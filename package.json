@@ -1,0 +1,11 @@
+{
+  "name": "costo-real-credito",
+  "version": "1.0.0",
+  "description": "¿Cuánto te cuesta de verdad este crédito? Conversión de tasas EA/MV/NMV, cuota fija, tabla de amortización con seguros y cargos, costo efectivo (TIR) y comparación con la tasa de usura de Colombia. Página estática sin build.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": "Mario Alejandro Puerta Alarcón",
+  "scripts": { "test": "node --test" },
+  "engines": { "node": ">=20" }
+}

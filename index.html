@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Cuánto te cuesta de verdad este crédito?</title>
+  <meta name="description" content="Pon el monto, el plazo, la tasa (EA, MV o NMV), el seguro y los cargos de un crédito y mira la cuota, la tabla de amortización, el total que pagas y el costo efectivo real, comparado con la tasa de usura vigente en Colombia. Calculadora educativa: no es asesoría financiera.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bangers&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/estilo.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F9F9F7'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-family='Arial' font-weight='900' font-size='22' fill='%230A090A'%3E%24%3C/text%3E%3Cpath d='M5 27h22' stroke='%23CB433E' stroke-width='3.5'/%3E%3C/svg%3E">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="saltar" href="#resultado">Saltar al resultado</a>
+  <header class="cabecera">
+    <span class="kanji" aria-hidden="true">金利</span>
+    <div class="titulo">
+      <p class="antetitulo">Tasa EA · cuota fija · costo efectivo · usura</p>
+      <h1>¿Cuánto te cuesta de verdad este crédito?</h1>
+    </div>
+    <nav class="nav">
+      <a class="boton-linea" href="proceso/">Cómo se hizo</a>
+      <button type="button" class="boton-linea" id="tema" aria-label="Cambiar tema">Tema: auto</button>
+    </nav>
+  </header>
+
+  <p class="aviso-legal" role="note"><strong>Esto no es asesoría financiera.</strong> Es una calculadora educativa: las cifras de un crédito real son las del contrato; pídele a la entidad la tasa efectiva anual y el costo total.</p>
+
+  <main class="tablero">
+    <form class="entrada vineta" id="formulario" aria-labelledby="entrada-t" novalidate>
+      <div class="entrada-cab">
+        <h2 id="entrada-t" class="etiqueta">1 · Tu crédito</h2>
+        <span class="chip chip-ejemplo" id="chip-ejemplo">Ejemplo ficticio: crédito de consumo</span>
+      </div>
+
+      <div class="rejilla-campos">
+        <div class="campo campo-ancho">
+          <label for="monto" class="etiqueta">Monto prestado</label>
+          <div class="con-unidad"><span aria-hidden="true">$</span><input id="monto" type="text" inputmode="numeric" autocomplete="off" value="10.000.000" aria-describedby="err-monto"></div>
+          <p class="error" id="err-monto" aria-live="polite"></p>
+        </div>
+        <div class="campo">
+          <label for="plazo" class="etiqueta">Plazo</label>
+          <div class="con-unidad"><input id="plazo" type="number" min="1" max="600" step="1" inputmode="numeric" value="36" aria-describedby="err-plazo"><span>meses</span></div>
+          <p class="error" id="err-plazo" aria-live="polite"></p>
+        </div>
+
+        <fieldset class="campo campo-ancho tasa">
+          <legend class="etiqueta">Tasa de interés pactada</legend>
+          <div class="fila-tasa">
+            <div class="con-unidad"><label for="tasa" class="visual-oculto">Valor de la tasa</label><input id="tasa" type="text" inputmode="decimal" autocomplete="off" value="24" aria-describedby="err-tasa ayuda-tasa"><span>%</span></div>
+            <div class="segmentos" role="radiogroup" aria-label="Tipo de tasa">
+              <label><input type="radio" name="tipo" value="EA" checked><span>EA</span></label>
+              <label><input type="radio" name="tipo" value="NMV"><span>NMV</span></label>
+              <label><input type="radio" name="tipo" value="MV"><span>MV</span></label>
+            </div>
+          </div>
+          <p class="ayuda" id="ayuda-tasa">EA: efectiva anual. NMV: nominal anual, mes vencido. MV: mensual vencida.</p>
+          <p class="error" id="err-tasa" aria-live="polite"></p>
+        </fieldset>
+
+        <fieldset class="campo campo-ancho">
+          <legend class="etiqueta">Seguro de vida deudor</legend>
+          <div class="fila-tasa">
+            <div class="con-unidad"><label for="seguro" class="visual-oculto">Valor del seguro</label><input id="seguro" type="text" inputmode="decimal" autocomplete="off" value="0,1" aria-describedby="err-seguro"><span id="seguro-unidad">% al mes</span></div>
+            <div class="segmentos" role="radiogroup" aria-label="Cómo se cobra el seguro">
+              <label><input type="radio" name="seguro-tipo" value="tasa" checked><span>% del saldo</span></label>
+              <label><input type="radio" name="seguro-tipo" value="fijo"><span>$ fijo</span></label>
+            </div>
+          </div>
+          <p class="error" id="err-seguro" aria-live="polite"></p>
+        </fieldset>
+
+        <div class="campo">
+          <label for="cargos" class="etiqueta">Cargos fijos al mes</label>
+          <div class="con-unidad"><span aria-hidden="true">$</span><input id="cargos" type="text" inputmode="numeric" autocomplete="off" value="5.000" aria-describedby="ayuda-cargos err-cargos"></div>
+          <p class="ayuda" id="ayuda-cargos">Cuota de manejo y otros.</p>
+          <p class="error" id="err-cargos" aria-live="polite"></p>
+        </div>
+        <div class="campo">
+          <label for="comisiones" class="etiqueta">Comisiones iniciales</label>
+          <div class="con-unidad"><span aria-hidden="true">$</span><input id="comisiones" type="text" inputmode="numeric" autocomplete="off" value="100.000" aria-describedby="ayuda-comisiones err-comisiones"></div>
+          <p class="ayuda" id="ayuda-comisiones">Estudio de crédito y similares.</p>
+          <p class="error" id="err-comisiones" aria-live="polite"></p>
+        </div>
+
+        <div class="campo campo-ancho">
+          <label for="modalidad" class="etiqueta">Comparar con la usura de</label>
+          <select id="modalidad"><option value="consumo-ordinario">Consumo y ordinario</option></select>
+        </div>
+      </div>
+      <div class="acciones">
+        <button type="button" class="mini" id="restaurar">Volver al ejemplo</button>
+      </div>
+    </form>
+
+    <section class="hud vineta" id="resultado" aria-labelledby="hud-t" data-semaforo="gris">
+      <span class="onoma" aria-hidden="true">CHA-CHING</span>
+      <h2 id="hud-t" class="etiqueta">Costo efectivo real <span class="marca">calculado aquí</span></h2>
+      <p class="grande" aria-live="polite"><span id="costo-ea">–</span> <small>EA</small></p>
+      <p class="explica" id="explica"></p>
+
+      <div class="semaforo" aria-live="polite">
+        <div class="luces" aria-hidden="true"><i class="l-rojo"></i><i class="l-ambar"></i><i class="l-verde"></i></div>
+        <div class="semaforo-txt">
+          <p class="sello" id="sello">–</p>
+          <p id="semaforo-detalle"></p>
+          <p class="fuente-usura"><span class="chip chip-carga" id="estado-usura">Cargando la usura…</span> <span id="fuente-usura"></span></p>
+        </div>
+      </div>
+
+      <div class="medidor-caja">
+        <div class="medidor" id="medidor" role="img" aria-label="Costo frente a la usura">
+          <i id="medidor-pactada" class="m-pactada"></i><i id="medidor-costo" class="m-costo"></i><b id="medidor-usura"></b>
+        </div>
+        <ul class="leyenda"><li><i style="--c: var(--cian)"></i>Tasa pactada</li><li><i style="--c: var(--rojo)"></i>Lo que añaden seguro, cargos y comisiones</li><li><i class="raya"></i>Usura</li></ul>
+      </div>
+
+      <dl class="cifras-hud">
+        <div><dt>Cuota fija</dt><dd id="r-cuota">–</dd></div>
+        <div><dt>Pago del mes 1</dt><dd id="r-pago1">–</dd></div>
+        <div><dt>Total pagado</dt><dd id="r-total">–</dd></div>
+        <div><dt>Intereses</dt><dd id="r-intereses">–</dd></div>
+        <div><dt>Seguros</dt><dd id="r-seguros">–</dd></div>
+        <div><dt>Cargos y comisiones</dt><dd id="r-cargos">–</dd></div>
+      </dl>
+
+      <div class="conversion">
+        <h3 class="etiqueta">Tu tasa pactada, en sus tres formas</h3>
+        <dl class="tres-tasas">
+          <div><dt>EA</dt><dd id="t-ea">–</dd></div>
+          <div><dt>NMV</dt><dd id="t-nmv">–</dd></div>
+          <div><dt>MV</dt><dd id="t-mv">–</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="composicion vineta" aria-labelledby="comp-t">
+      <h2 id="comp-t">2 · A dónde va tu plata</h2>
+      <div class="barra-total" id="barra-total" role="img" aria-label="Composición del total pagado"></div>
+      <ul class="leyenda" id="leyenda-total"></ul>
+    </section>
+
+    <section class="amortizacion vineta" aria-labelledby="tabla-t">
+      <div class="tabla-cab">
+        <h2 id="tabla-t">3 · Tabla de amortización</h2>
+        <p class="ayuda">Sistema francés: cuota fija; al principio pagas sobre todo intereses y al final, capital.</p>
+      </div>
+      <div class="tabla-scroll" tabindex="0" role="region" aria-labelledby="tabla-t">
+        <table class="tabla">
+          <thead><tr><th scope="col">Mes</th><th scope="col">Saldo inicial</th><th scope="col">Cuota</th><th scope="col">Interés</th><th scope="col">Capital</th><th scope="col">Seguro</th><th scope="col">Cargos</th><th scope="col">Pago del mes</th><th scope="col">Saldo final</th></tr></thead>
+          <tbody id="cuerpo-tabla"></tbody>
+          <tfoot id="pie-tabla"></tfoot>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Cálculo en tu navegador. Supone cuotas mensuales vencidas, tasa fija, sin pagos extra ni mora. El costo efectivo es la tasa interna de retorno (TIR) mensual de lo que recibes y pagas, llevada a efectiva anual. La usura sale de la certificación de la Superintendencia Financiera de Colombia (1,5 × interés bancario corriente). <strong>Esto no es asesoría financiera</strong> y no recomienda productos ni entidades.</p>
+    <p class="creditos"><a href="https://github.com/ale0009" target="_blank" rel="noopener">Mario Puerta «ale0009»</a> × <a href="https://www.linkedin.com/in/davidalexanderrinconcorredorkuronoma/" target="_blank" rel="noopener">David Rincón «Kuronoma»</a> <a href="https://kx-portafolio.vercel.app" target="_blank" rel="noopener">Portafolio</a></p>
+  </footer>
+</body>
+</html>
