@@ -4,22 +4,34 @@
 /**
  * Lee un número escrito en español: «24,5», «24.5», «1.234,5», «10.000.000», «$ 150.000». Devuelve null si no es válido.
  * Con `montos: true`, un único punto seguido de 3 cifras («150.000») se lee como separador de miles;
- * sin él («0.125» en una tasa) es punto decimal.
+ * sin él («0.125» en una tasa) es punto decimal. Los puntos de miles deben ir en grupos de 3 cifras.
  */
 export function leerNumero(texto, { montos = false } = {}) {
   if (typeof texto === 'number') return Number.isFinite(texto) ? texto : null;
   if (typeof texto !== 'string') return null;
   let t = texto.replace(/[\s$%]/g, '');
   if (!t) return null;
-  if (!/^-?[\d.,]+$/.test(t)) return null;
+  // cifras con separadores sueltos: nada de «12..3», «1.,5», «.5.» ni separador al principio o al final
+  if (!/^-?\d+([.,]\d+)*$/.test(t)) return null;
+  const MILES = /^-?\d{1,3}(\.\d{3})+$/;
   const comas = (t.match(/,/g) || []).length;
   if (comas > 1) return null;
   if (comas === 1) {
-    t = t.replace(/\./g, '').replace(',', '.');
+    const [entera, decimal] = t.split(',');
+    // la coma es el decimal: antes, puntos de miles bien agrupados («1.234,5»); después, solo cifras («1,234.5» no)
+    if (decimal.includes('.')) return null;
+    if (entera.includes('.') && !MILES.test(entera)) return null;
+    t = `${entera.replace(/\./g, '')}.${decimal}`;
   } else {
     const puntos = (t.match(/\./g) || []).length;
-    // «10.000.000» o «150.000»: puntos de miles. «24.5»: punto decimal.
-    if (puntos > 1 || (montos && /^-?\d{1,3}\.\d{3}$/.test(t))) t = t.replace(/\./g, '');
+    // «10.000.000» o «150.000»: puntos de miles (grupos de 3). «24.5»: punto decimal.
+    if (puntos > 1) {
+      if (!MILES.test(t)) return null; // «1.23.4», «1.2345.678»
+      t = t.replace(/\./g, '');
+    } else if (montos && puntos === 1 && /\.\d{3}$/.test(t)) {
+      if (!MILES.test(t)) return null; // «1500.000»: ¿miles mal puestos o decimales? Mejor no adivinar
+      t = t.replace(/\./g, '');
+    }
   }
   const n = Number(t);
   return Number.isFinite(n) ? n : null;

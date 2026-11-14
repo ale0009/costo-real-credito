@@ -55,7 +55,8 @@ h1, h2 { font-family: var(--fuente-titulo); font-weight: 400; letter-spacing: 0.
 p { margin: 0 0 0.6rem; }
 a { color: var(--cian-texto); text-underline-offset: 3px; text-decoration-thickness: 2px; }
 a:hover { color: var(--rojo-texto); }
-:focus-visible { outline: 3px solid var(--cian); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--cian-texto); outline-offset: 3px; } /* --cian-texto: ≥ 3:1 también sobre los fondos tenues */
+[tabindex="-1"]:focus { outline: none; } /* destinos del enlace de salto: reciben el foco sin recuadro */
 
 .saltar { position: absolute; left: 1rem; top: -4rem; z-index: 10; background: var(--tinta); color: var(--papel); padding: 0.5rem 1rem; }
 .saltar:focus { top: 1rem; }
@@ -214,7 +215,7 @@ fieldset.campo legend { padding: 0; }
 .segmentos span { display: block; padding: 0.45rem 0.65rem; font: 700 0.85rem/1.1 var(--fuente); border-left: 2px solid var(--tinta); }
 .segmentos label:first-child span { border-left: 0; }
 .segmentos input:checked + span { background: var(--tinta); color: var(--papel); }
-.segmentos input:focus-visible + span { outline: 3px solid var(--cian); outline-offset: -5px; }
+.segmentos input:focus-visible + span { outline: 3px solid var(--cian-texto); outline-offset: -5px; }
 .acciones { margin-top: 0.7rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* HUD */
@@ -268,7 +269,7 @@ fieldset.campo legend { padding: 0; }
 .tabla-cab { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.2rem 1rem; }
 .tabla-cab .ayuda { margin: 0 0 0.6rem; }
 .tabla-scroll { overflow: auto; max-width: 100%; max-height: 28rem; border: 2px solid var(--tinta); }
-.tabla-scroll:focus-visible { outline: 3px solid var(--cian); outline-offset: 2px; }
+.tabla-scroll:focus-visible { outline: 3px solid var(--cian-texto); outline-offset: 2px; }
 .tabla { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
 .tabla th, .tabla td { border: 1px solid var(--tinta-suave); padding: 0.3rem 0.5rem; text-align: right; white-space: nowrap; font-family: var(--fuente-num); }
 .tabla thead th { position: sticky; top: 0; background: var(--tinta); color: var(--papel); font: 700 0.78rem/1.2 var(--fuente); text-align: right; z-index: 1; }

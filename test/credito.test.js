@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { leerNumero, convertirTasa, efectivaAPeriodica, periodicaAEfectiva, nominalAEfectiva, efectivaANominal } from '../js/tasas.js';
-import { cuotaFrancesa, tablaAmortizacion, tir, vpn, flujosDelDeudor, analizarCredito } from '../js/credito.js';
-import { usuraDesdeIBC, semaforo, certificacionDesdeFilas, vigenteEn, leerPorcentajeTexto } from '../js/usura.js';
-import { pesos, pct, fechaLarga } from '../js/formato.js';
+import { cuotaFrancesa, tablaAmortizacion, tir, vpn, flujosDelDeudor, analizarCredito, TIR_MAXIMA } from '../js/credito.js';
+import { usuraDesdeIBC, semaforo, semaforoCredito, certificacionDesdeFilas, vigenteEn, leerPorcentajeTexto } from '../js/usura.js';
+import { pesos, pct, fechaLarga, hoyBogota } from '../js/formato.js';
 
 const cerca = (a, b, tol = 1e-9) => assert.ok(Math.abs(a - b) <= tol, `${a} ≉ ${b} (tol ${tol})`);
 
@@ -164,4 +164,61 @@ test('formato en español', () => {
   assert.equal(pesos(-1500), '−$ 1.500');
   assert.equal(pct(0.2834), '28,34 %');
   assert.equal(fechaLarga('2026-11-01'), '1 de noviembre de 2026');
+});
+
+test('leerNumero rechaza puntos sueltos y miles mal agrupados', () => {
+  for (const malo of ['12..3', '1.23.4', '1.2345.678', '1,234.5', '1.,5', '1,.5', '.5.', '5.', '24,', '1.23,5'])
+    assert.equal(leerNumero(malo), null, malo);
+  assert.equal(leerNumero('1500.000', { montos: true }), null); // ¿miles o decimales? no se adivina
+  assert.equal(leerNumero('1.500.000', { montos: true }), 1500000);
+  assert.equal(leerNumero('1500,5', { montos: true }), 1500.5);
+  assert.equal(leerNumero('1500.5', { montos: true }), 1500.5);
+  assert.equal(leerNumero('-2,5'), -2.5);
+  assert.equal(leerNumero('28,34 %'), 28.34);
+});
+
+test('TIR por encima del 1000 % mensual: el techo de búsqueda se amplía', () => {
+  // recibe 5.000 (100.000 menos 95.000 de comisión) y paga 100.000 al mes siguiente: TIR = 1900 % mensual
+  cerca(tir([5000, -100_000]), 19, 1e-9);
+  assert.equal(tir([1, -1e12]), null); // más allá de TIR_MAXIMA no se inventa un valor
+  assert.ok(TIR_MAXIMA >= 1e6);
+});
+
+test('comisión enorme en plazo corto: el semáforo no sale verde', () => {
+  const r = analizarCredito({ monto: 100_000, plazo: 1, mv: 0, comisiones: 95_000 });
+  cerca(r.costoSinSeguros.mensual, 19, 1e-9);
+  assert.equal(semaforoCredito(0, r.costoSinSeguros.ea, 0.2834), 'rojo');
+  // si aun así el costo no se puede calcular por exceso, es rojo; si no hay costo que comparar, gris (nunca verde)
+  const extremo = analizarCredito({ monto: 1e12, plazo: 1, mv: 0, comisiones: 1e12 - 1 });
+  assert.equal(extremo.costoSinSeguros, null);
+  assert.equal(extremo.desborde.sinSeguros, true);
+  assert.equal(semaforoCredito(0, NaN, 0.2834, { costoDesbordado: extremo.desborde.sinSeguros }), 'rojo');
+  assert.equal(semaforoCredito(0, NaN, 0.2834), 'gris');
+  assert.equal(semaforoCredito(0.20, 0.261, 0.2834), 'ambar');
+  assert.equal(semaforoCredito(0.20, 0.21, 0.2834), 'verde');
+  assert.equal(semaforoCredito(convertirTasa('EA', 0.2834).ea, 0.2834, 0.2834), 'rojo'); // tolerancia de redondeo
+});
+
+test('cuota francesa que colapsa por precisión: se rechaza en vez de cargar todo a la última cuota', () => {
+  assert.throws(() => tablaAmortizacion({ monto: 10_000_000, plazo: 600, mv: 0.2 }), RangeError);
+  assert.throws(() => tablaAmortizacion({ monto: 10_000_000, plazo: 600, mv: 0.06 }), RangeError);
+  // los casos largos pero calculables siguen funcionando con la cuota fija
+  for (const [plazo, mv] of [[600, 0.02], [600, 0.03], [120, 0.2], [360, 0.05]]) {
+    const t = tablaAmortizacion({ monto: 10_000_000, plazo, mv });
+    cerca(t.filas.at(-1).cuota, t.cuota, Math.max(1, t.cuota * 1e-4));
+  }
+});
+
+test('pct no muestra «-0» y la fecha de hoy va en hora de Colombia', () => {
+  assert.equal(pct(-4.82e-17, 3), '0,000 %');
+  assert.equal(pct(-0), '0,00 %');
+  assert.equal(pct(-0.0123), '-1,23 %');
+  // 1 de diciembre a las 03:00 UTC sigue siendo 30 de noviembre en Bogotá (UTC−5)
+  assert.equal(hoyBogota(new Date('2026-12-01T03:00:00Z')), '2026-11-30');
+  assert.equal(hoyBogota(new Date('2026-12-01T06:00:00Z')), '2026-12-01');
+});
+
+test('certificación sin número de resolución: texto de respaldo, nunca «undefined»', () => {
+  const c = certificacionDesdeFilas([{ vigencia_desde: '2026-11-01T00:00:00.000', interes_bancario_corriente: '18.89%', modalidad: 'CONSUMO Y ORDINARIO' }]);
+  assert.ok(!/undefined|null/.test(c.resolucion), c.resolucion);
 });

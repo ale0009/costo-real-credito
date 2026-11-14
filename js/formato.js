@@ -11,7 +11,14 @@ export function pesos(v) {
 /** Porcentaje desde una fracción: 0.2834 → «28,34 %». */
 export function pct(fraccion, decimales = 2) {
   if (!Number.isFinite(fraccion)) return '–';
-  return `${(fraccion * 100).toFixed(decimales).replace('.', ',')} %`;
+  let txt = (fraccion * 100).toFixed(decimales);
+  if (/^-0(\.0*)?$/.test(txt)) txt = txt.slice(1); // sin «-0,000 %» por ruido de punto flotante
+  return `${txt.replace('.', ',')} %`;
+}
+
+/** Fecha de hoy (AAAA-MM-DD) en hora de Colombia, no en UTC. */
+export function hoyBogota(fecha = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(fecha);
 }
 
 /** Fecha AAAA-MM-DD → «1 de noviembre de 2026». */

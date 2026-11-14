@@ -2,8 +2,8 @@
 import { iniciarTema } from './tema.js';
 import { leerNumero, convertirTasa } from './tasas.js';
 import { analizarCredito } from './credito.js';
-import { certificacionDesdeFilas, semaforo, vigenteEn } from './usura.js';
-import { pesos, pct, fechaLarga } from './formato.js';
+import { certificacionDesdeFilas, semaforoCredito, vigenteEn } from './usura.js';
+import { pesos, pct, fechaLarga, hoyBogota } from './formato.js';
 import { EJEMPLO } from './ejemplo.js';
 
 const $ = (id) => document.getElementById(id);
@@ -126,6 +126,9 @@ function modalidadActual() {
   return cert.modalidades.find((m) => m.id === $('modalidad').value) || cert.modalidades[0];
 }
 
+/** Costos absurdos (comisiones enormes en plazos cortos) se leen mejor acotados que con 18 cifras. */
+const pctCosto = (x) => (x > 100 ? 'más de 10.000 %' : pct(x));
+
 const TEXTO_SELLO = {
   verde: 'Por debajo de la usura',
   ambar: 'Cerca del tope',
@@ -144,17 +147,17 @@ function pintarUsura(d, tasaEA) {
   }
   const usura = mod.usura_ea / 100;
   const sinSeg = d.costoSinSeguros ? d.costoSinSeguros.ea : NaN;
-  const orden = ['verde', 'ambar', 'rojo'];
-  const a = semaforo(tasaEA, usura);
-  const b = semaforo(sinSeg, usura);
-  const estado = orden[Math.max(orden.indexOf(a), orden.indexOf(b))] || 'gris';
+  const estado = semaforoCredito(tasaEA, sinSeg, usura, { costoDesbordado: d.desborde.sinSeguros });
   hud.dataset.semaforo = estado;
   $('sello').textContent = TEXTO_SELLO[estado];
-  const base = `Usura de ${mod.nombre.toLowerCase()}: <strong>${pct(usura)} EA</strong>. Tasa pactada: ${pct(tasaEA)}; con cargos y comisiones, sin seguros: ${pct(sinSeg)} (estimación de lo que cuenta como interés para la usura).`;
+  const sinSegTexto = d.desborde.sinSeguros ? 'tan alto que no se puede calcular' : pctCosto(sinSeg);
+  const base = `Usura de ${mod.nombre.toLowerCase()}: <strong>${pct(usura)} EA</strong>. Tasa pactada: ${pct(tasaEA)}; con cargos y comisiones, sin seguros: ${sinSegTexto} (estimación de lo que cuenta como interés para la usura).`;
   const cola = {
     verde: '',
     ambar: ' Está a menos de 3 puntos del tope.',
-    rojo: tasaEA >= usura ? ' La tasa pactada ya llega al tope legal: revisa el contrato.' : ' Con los cargos y comisiones el costo llega al tope legal: revisa qué cobra el contrato.',
+    // misma tolerancia que semaforo(): 28,34 % EA escrito a mano da 0,28339999… por redondeo
+    rojo: tasaEA >= usura - 1e-12 ? ' La tasa pactada ya llega al tope legal: revisa el contrato.' : ' Con los cargos y comisiones el costo llega al tope legal: revisa qué cobra el contrato.',
+    gris: ' No se pudo calcular el costo con cargos y comisiones, así que no hay comparación.',
   }[estado] || '';
   $('semaforo-detalle').innerHTML = base + cola;
 
@@ -165,13 +168,13 @@ function pintarUsura(d, tasaEA) {
   $('medidor-costo').style.left = w(tasaEA);
   $('medidor-costo').style.width = `calc(${w(d.costoTotal ? d.costoTotal.ea : tasaEA)} - ${w(tasaEA)})`;
   $('medidor-usura').style.left = w(usura);
-  $('medidor').setAttribute('aria-label', `Tasa pactada ${pct(tasaEA)}, costo efectivo ${pct(d.costoTotal ? d.costoTotal.ea : NaN)}, usura ${pct(usura)}.`);
+  $('medidor').setAttribute('aria-label', `Tasa pactada ${pct(tasaEA)}, costo efectivo ${pctCosto(d.costoTotal ? d.costoTotal.ea : NaN)}, usura ${pct(usura)}.`);
 }
 
 function pintarFuente() {
   const chip = $('estado-usura');
   if (!cert) { chip.className = 'chip chip-carga'; chip.textContent = 'Cargando la usura…'; $('fuente-usura').textContent = ''; return; }
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = hoyBogota();
   const vigente = vigenteEn(cert, hoy);
   if (origen === 'vivo') { chip.className = 'chip chip-vivo'; chip.textContent = 'En vivo: datos.gov.co'; }
   else { chip.className = 'chip chip-guardado'; chip.textContent = `Sin conexión: datos guardados del ${fechaLarga(cert.fecha_consulta || '2026-11-14')}`; }
@@ -179,31 +182,50 @@ function pintarFuente() {
   $('fuente-usura').innerHTML = `${prefijo} del ${fechaLarga(cert.vigencia_desde)} al ${fechaLarga(cert.vigencia_hasta)} · ${cert.resolucion} · <a href="https://www.superfinanciera.gov.co/publicaciones/10829/interes-bancario-corriente/" target="_blank" rel="noopener">Superintendencia Financiera</a>${motivoGuardado ? ` <span class="motivo">${motivoGuardado}</span>` : ''}`;
 }
 
+/** Borra todo resultado anterior: con datos inválidos no debe quedar en pantalla un cálculo viejo. */
+function limpiarResultados(mensaje) {
+  $('resultado').dataset.semaforo = 'gris';
+  $('sello').textContent = TEXTO_SELLO.gris;
+  $('semaforo-detalle').textContent = '';
+  $('costo-ea').textContent = '–';
+  $('explica').textContent = mensaje;
+  for (const id of ['t-ea', 't-nmv', 't-mv', 'r-cuota', 'r-pago1', 'r-total', 'r-intereses', 'r-seguros', 'r-cargos']) $(id).textContent = '–';
+  for (const id of ['medidor-pactada', 'medidor-costo', 'medidor-usura']) { $(id).style.width = ''; $(id).style.left = ''; }
+  $('medidor').setAttribute('aria-label', 'Sin datos para comparar.');
+  $('barra-total').replaceChildren();
+  $('barra-total').setAttribute('aria-label', 'Sin datos para la composición del total.');
+  $('leyenda-total').replaceChildren();
+  $('cuerpo-tabla').replaceChildren();
+  $('pie-tabla').replaceChildren();
+}
+
 let ultimo = null;
 function actualizar() {
   $('chip-ejemplo').hidden = !esEjemplo();
   const entrada = leerFormulario();
   if (!entrada) {
-    $('resultado').dataset.semaforo = 'gris';
-    $('costo-ea').textContent = '–';
-    $('explica').textContent = 'Revisa los datos marcados en rojo.';
+    ultimo = null;
+    limpiarResultados('Revisa los datos marcados en rojo.');
     return;
   }
   let d;
   try { d = analizarCredito(entrada.credito); } catch (e) {
-    $('explica').textContent = `No se pudo calcular: ${e.message}`;
+    ultimo = null;
+    limpiarResultados(`No se pudo calcular: ${e.message}`);
     return;
   }
   ultimo = { d, entrada };
   const { tasas } = entrada;
   const c = d.costoTotal;
-  $('costo-ea').textContent = c ? pct(c.ea) : '–';
+  $('costo-ea').textContent = c ? pctCosto(c.ea) : '–';
   const extra = c ? c.ea - tasas.ea : 0;
   $('explica').innerHTML = c
     ? (extra > 0.00005
-      ? `La tasa dice <strong>${pct(tasas.ea)} EA</strong>; con seguro, cargos y comisiones pagas <strong>${pct(c.ea)} EA</strong>: ${(extra * 100).toFixed(2).replace(".", ",")} puntos más. Equivale a ${pct(c.mensual, 3)} al mes.`
+      ? `La tasa dice <strong>${pct(tasas.ea)} EA</strong>; con seguro, cargos y comisiones pagas <strong>${pctCosto(c.ea)} EA</strong>${c.ea > 100 ? '.' : `: ${(extra * 100).toFixed(2).replace('.', ',')} puntos más.`} Equivale a ${pct(c.mensual, 3)} al mes.`
       : `Sin seguro, cargos ni comisiones, el costo efectivo es la misma tasa pactada: <strong>${pct(tasas.ea)} EA</strong>.`)
-    : 'No hay una tasa que iguale lo recibido y lo pagado.';
+    : (d.desborde.total
+      ? 'El costo efectivo es tan alto que no se puede calcular: pagas mucho más de lo que recibes en muy poco tiempo. Revisa las comisiones.'
+      : 'No hay una tasa que iguale lo recibido y lo pagado.');
 
   $('t-ea').textContent = pct(tasas.ea, 4);
   $('t-nmv').textContent = pct(tasas.nmv, 4);
@@ -270,7 +292,7 @@ async function iniciarDatos() {
     const vivo = await cargarEnVivo();
     // la certificación en vivo solo reemplaza a la guardada si es igual o más reciente
     if (!cert || vivo.vigencia_desde >= cert.vigencia_desde) {
-      cert = { ...vivo, fecha_consulta: new Date().toISOString().slice(0, 10) };
+      cert = { ...vivo, fecha_consulta: hoyBogota() };
       origen = 'vivo';
       motivoGuardado = '';
       llenarModalidades();

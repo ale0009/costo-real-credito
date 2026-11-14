@@ -28,7 +28,14 @@ export function tablaAmortizacion({ monto, plazo, mv, seguro = { tipo: 'fijo', v
   for (let k = 1; k <= plazo; k++) {
     const interes = saldo * mv;
     let capital = cuota - interes;
-    if (k === plazo) capital = saldo; // la última cuota cierra el saldo exacto (sin residuos de redondeo)
+    if (k === plazo) {
+      // Con plazos y tasas extremos, (1 + i)^−n se pierde en el redondeo de punto flotante: la cuota
+      // queda en solo intereses y la última tendría que pagar casi todo el capital. Mejor rechazar que mentir.
+      if (Math.abs(saldo - capital) > Math.max(1, cuota * 1e-4)) {
+        throw new RangeError('Con ese plazo y esa tasa la cuota fija no se puede calcular con precisión: reduce el plazo o la tasa.');
+      }
+      capital = saldo; // la última cuota cierra el saldo exacto (sin residuos de redondeo)
+    }
     const seg = seguro.tipo === 'tasa' ? saldo * seguro.valor : seguro.valor;
     const saldoInicial = saldo;
     saldo = Math.max(0, saldo - capital);
@@ -58,9 +65,13 @@ function dvpn(flujos, r) {
   return s;
 }
 
+/** Techo de la búsqueda de la TIR: 1.000.000 (100.000.000 %) por periodo. Por encima, null. */
+export const TIR_MAXIMA = 1e6;
+
 /**
  * Tasa interna de retorno periódica: r tal que VPN = 0.
- * Newton-Raphson desde `inicial`; si no converge o se sale del rango, bisección en [−0,99; 10].
+ * Newton-Raphson desde `inicial`; si no converge o se sale del rango, bisección en [−0,99; 10],
+ * y si ahí no hay cambio de signo, el techo se duplica hasta TIR_MAXIMA (comisiones enormes en plazos cortos).
  * Devuelve null si no hay cambio de signo (no existe una TIR en el rango).
  */
 export function tir(flujos, { inicial = 0.01, tol = 1e-12, maxIter = 100 } = {}) {
@@ -76,6 +87,11 @@ export function tir(flujos, { inicial = 0.01, tol = 1e-12, maxIter = 100 } = {})
   }
   let lo = -0.99, hi = 10;
   let flo = vpn(flujos, lo), fhi = vpn(flujos, hi);
+  while (!(flo * fhi <= 0) && hi < TIR_MAXIMA && Number.isFinite(fhi)) {
+    lo = hi; flo = fhi;
+    hi = Math.min(hi * 2, TIR_MAXIMA);
+    fhi = vpn(flujos, hi);
+  }
   if (!(flo * fhi <= 0)) return null;
   for (let k = 0; k < 300; k++) {
     const mid = (lo + hi) / 2;
@@ -101,10 +117,28 @@ export function costoEfectivo(flujos) {
   return { mensual, ea: periodicaAEfectiva(mensual, 12) };
 }
 
-/** Todo junto: tabla, costo total (con seguros) y costo sin seguros (el que se compara con la usura). */
+/**
+ * ¿El costo es incalculable por exceso? Sin TIR, pero se recibe algo y se paga más de lo recibido:
+ * la TIR existe y es positiva, solo que supera TIR_MAXIMA.
+ */
+function desbordado(costo, flujos) {
+  if (costo !== null) return false;
+  const pagado = -flujos.slice(1).reduce((s, f) => s + f, 0);
+  return flujos[0] > 0 && pagado > flujos[0];
+}
+
+/**
+ * Todo junto: tabla, costo total (con seguros) y costo sin seguros (el que se compara con la usura).
+ * `desborde.total` / `desborde.sinSeguros`: el costo existe pero es demasiado alto para calcularlo.
+ */
 export function analizarCredito(c) {
   const tabla = tablaAmortizacion(c);
-  const total = costoEfectivo(flujosDelDeudor(c.monto, tabla));
-  const sinSeguros = costoEfectivo(flujosDelDeudor(c.monto, tabla, { conSeguros: false }));
-  return { ...tabla, costoTotal: total, costoSinSeguros: sinSeguros };
+  const fTotal = flujosDelDeudor(c.monto, tabla);
+  const fSin = flujosDelDeudor(c.monto, tabla, { conSeguros: false });
+  const total = costoEfectivo(fTotal);
+  const sinSeguros = costoEfectivo(fSin);
+  return {
+    ...tabla, costoTotal: total, costoSinSeguros: sinSeguros,
+    desborde: { total: desbordado(total, fTotal), sinSeguros: desbordado(sinSeguros, fSin) },
+  };
 }

@@ -39,7 +39,9 @@ export function certificacionDesdeFilas(filas) {
     return { orden: Object.keys(NOMBRES).indexOf(f.modalidad), id, nombre, ibc_ea: ibc, usura_ea: usuraDesdeIBC(ibc) };
   }).sort((a, b) => a.orden - b.orden).map(({ orden, ...m }) => m);
   return {
-    resolucion: `Resolución ${consumo.resolucion} de ${consumo.fecha_resolucion ? consumo.fecha_resolucion.slice(0, 4) : consumo.vigencia_desde.slice(0, 4)}`,
+    resolucion: String(consumo.resolucion ?? '').trim()
+      ? `Resolución ${String(consumo.resolucion).trim()} de ${consumo.fecha_resolucion ? consumo.fecha_resolucion.slice(0, 4) : consumo.vigencia_desde.slice(0, 4)}`
+      : 'Certificación de la Superintendencia Financiera (sin número de resolución en los datos)',
     fecha_resolucion: consumo.fecha_resolucion ? consumo.fecha_resolucion.slice(0, 10) : null,
     vigencia_desde: consumo.vigencia_desde.slice(0, 10),
     vigencia_hasta: consumo.vigencia_hasta ? consumo.vigencia_hasta.slice(0, 10) : null,
@@ -62,4 +64,19 @@ export function semaforo(tasaEA, usuraEA, margen = 0.03) {
   if (tasaEA >= usuraEA - 1e-12) return 'rojo';
   if (tasaEA >= usuraEA - margen) return 'ambar';
   return 'verde';
+}
+
+/**
+ * Semáforo del crédito: el peor entre la tasa pactada y el costo con cargos y comisiones (sin seguros).
+ * Si el costo no se pudo calcular, nunca sale verde: rojo si es incalculable por exceso (`costoDesbordado`),
+ * gris si no hay costo que comparar.
+ */
+export function semaforoCredito(tasaEA, costoEA, usuraEA, { costoDesbordado = false } = {}) {
+  const orden = ['verde', 'ambar', 'rojo'];
+  const a = semaforo(tasaEA, usuraEA);
+  let b = semaforo(costoEA, usuraEA);
+  if (b === 'gris' && costoDesbordado && Number.isFinite(usuraEA)) b = 'rojo';
+  if (a === 'rojo' || b === 'rojo') return 'rojo';
+  if (a === 'gris' || b === 'gris') return 'gris';
+  return orden[Math.max(orden.indexOf(a), orden.indexOf(b))];
 }
